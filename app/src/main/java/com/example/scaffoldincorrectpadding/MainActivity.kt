@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,19 +38,10 @@ import com.example.scaffoldincorrectpadding.ui.theme.ScaffoldIncorrectPaddingThe
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
-    private fun isNightMode(context: Context): Boolean {
-        val nightModeFlags =
-            context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.isAppearanceLightStatusBars = isNightMode(this).not()
-        val loadingWithScaffold = true
+        enableEdgeToEdge()
         setContent {
             ScaffoldIncorrectPaddingTheme {
                 var loadingState by remember {
@@ -60,21 +52,9 @@ class MainActivity : ComponentActivity() {
                     loadingState = false
                 }
                 if (loadingState) {
-                    if(loadingWithScaffold){
-                        Scaffold(
-                            modifier = Modifier.fillMaxSize(),
-                            topBar = {}
-                        ) { innerPadding ->
-                            Text(modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding), text = "Loading")
-
-                        }
-                    }else{
                         Text(modifier = Modifier
                             .fillMaxSize()
                             , text = "Loading")
-                    }
                 } else {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
@@ -112,27 +92,39 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+val listSize = 50
 @Composable
 fun Content(paddings: PaddingValues) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        repeat(100) {
+        repeat(listSize) {
             item {
-                val itemModifier = when (it) {
+                val modifier = Modifier//.fillMaxWidth()
+                when (it) {
                     0 -> {
-                        LaunchedEffect(key1 = paddings) {
-                            println("🚒 pads: $paddings")
-                        }
-                        Modifier.padding(top = paddings.calculateTopPadding())
+                        Text(
+                            text = "=====> Very first item $it",
+                            modifier = modifier
+                                .padding(top = paddings.calculateTopPadding())
+                                .background(nextColor())
+                        )
                     }
 
-                    else -> Modifier
-                }
+                    listSize - 1 -> {
+                        Text(
+                            text = "=====> Very last item $it",
+                            modifier = modifier
+                                .padding(bottom = paddings.calculateBottomPadding())
+                                .background(nextColor())
+                        )
+                    }
 
-                Text(
-                    text = "Hello $it",
-                    modifier = itemModifier.background(nextColor())
-                )
+                    else -> {
+                        Text(
+                            text = "Hello $it",
+                            modifier = modifier.background(nextColor())
+                        )
+                    }
+                }
             }
         }
     }
@@ -154,11 +146,4 @@ fun nextColor(): Color {
     )
 
     return colors[current++ % colors.lastIndex]
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ScaffoldIncorrectPaddingTheme {
-    }
 }
