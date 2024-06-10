@@ -18,3 +18,12 @@ If the `ScaffoldSubcomposeInMeasureFix` flag is set to false, the height becomes
 
 ![correct_padding.png](./correct_padding.png)
 
+First time problem got with migration from composeBom = "2024.01.00" to composeBom = "2024.02.00" 
+
+# Versions
+
+Jetpack Compose version: composeBom = "2024.05.00"
+Material Library Version (M2, M3 or Both?): M3
+Material Compose component used: Scaffold + LazyColumn
+Android Studio Build: `#AI-233.14808.21.2331.11842104, built on May 15, 2024`
+Kotlin version: 1.9.0
