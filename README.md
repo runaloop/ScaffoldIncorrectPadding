@@ -7,8 +7,8 @@ content block of our Scaffold without the status bar padding
 
 Due to this, the indentation for the first element is not calculated correctly and it climbs onto the top bar.
 
-![incorrect_padding.png](./incorrect_padding.png)
-я 
+![incorrect_padding.png](https://github.com/runaloop/ScaffoldIncorrectPadding/raw/main/incorrect_padding.png)
+
 The screenshot shows a scaffold with a top bar (marked as 1) and a lazy column in the content.
 It can be seen that the top padding of the zero-element of lazy column (marked as 2) does not 
 take the height of the status bar. This can also be seen from the text inside the top bar and the 
