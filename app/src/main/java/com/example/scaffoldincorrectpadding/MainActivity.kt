@@ -1,13 +1,12 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.scaffoldincorrectpadding
 
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,7 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldSubcomposeInMeasureFix
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,39 +32,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import com.example.scaffoldincorrectpadding.ui.theme.ScaffoldIncorrectPaddingTheme
 import kotlinx.coroutines.delay
+
+const val listSize = 50
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        ScaffoldSubcomposeInMeasureFix = true
         setContent {
             ScaffoldIncorrectPaddingTheme {
-                var loadingState by remember {
+                var isLoading by remember {
                     mutableStateOf(true)
                 }
                 LaunchedEffect(key1 = Unit) {
                     delay(1000)
-                    loadingState = false
+                    isLoading = false
                 }
-                if (loadingState) {
-                        Text(modifier = Modifier
-                            .fillMaxSize()
-                            , text = "Loading")
+                if (isLoading) {
+                    Text(modifier = Modifier.fillMaxSize(), text = "Loading")
                 } else {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
-                        topBar = {
-                            TopBar()
-                        }
+                        topBar = { TopBar() },
                     ) { innerPadding ->
                         Content(innerPadding)
-
                     }
                 }
             }
@@ -72,56 +69,46 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun TopBar() {
+        val barHeight = 90.dp
+        val paddings = WindowInsets.systemBars
+            .only(WindowInsetsSides.Top)
+            .asPaddingValues()
+            .calculateTopPadding()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(false) {}
                 .background(
                     Color.Red.copy(.2f),
                     shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
                 )
                 .padding(
-                    top = WindowInsets.systemBars
-                        .only(WindowInsetsSides.Top)
-                        .asPaddingValues()
-                        .calculateTopPadding() + 8.dp
+                    top = paddings
                 )
-                .height(66.dp)
-        ) {
-            Text(text = "RTITLE")
-        }
+                .height(barHeight)
+        ) { Text(text = "Top Title h: $barHeight, top paddings: $paddings\n ScaffoldSubcomposeInMeasureFix: $ScaffoldSubcomposeInMeasureFix ") }
     }
 }
-val listSize = 50
+
+
 @Composable
 fun Content(paddings: PaddingValues) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         repeat(listSize) {
             item {
-                val modifier = Modifier//.fillMaxWidth()
                 when (it) {
                     0 -> {
                         Text(
-                            text = "=====> Very first item $it",
-                            modifier = modifier
+                            text = "=====> #$it paddings top: ${paddings.calculateTopPadding()}",
+                            modifier = Modifier
                                 .padding(top = paddings.calculateTopPadding())
-                                .background(nextColor())
-                        )
-                    }
-
-                    listSize - 1 -> {
-                        Text(
-                            text = "=====> Very last item $it",
-                            modifier = modifier
-                                .padding(bottom = paddings.calculateBottomPadding())
                                 .background(nextColor())
                         )
                     }
 
                     else -> {
                         Text(
-                            text = "Hello $it",
-                            modifier = modifier.background(nextColor())
+                            text = "Hello #$it",
+                            modifier = Modifier.background(nextColor())
                         )
                     }
                 }
